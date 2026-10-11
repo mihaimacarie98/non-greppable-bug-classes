@@ -58,7 +58,9 @@ diff <(grep -nE 'luksAddKey|luksKillSlot|install -|mv -|rm -|trap |flock|systemc
 
 ### 2.3 Read the comments in the safe branch as a specification
 
-This is the single highest-yield step. When a branch carries a comment like *"a power loss before the switch leaves the old target asking for its password, never unlocked unattended"*, you have been handed the invariant in the author's own words. Treat it as a requirement and check the sibling against it. If the sibling violates it, the author has already conceded the severity for you — quote the comment in your report.
+This is the single highest-yield step. Look for a comment that states a safety property in general terms — the recognisable shape is *"B happens only after A, so an interruption between them cannot leave &lt;bad state&gt;"*. When you find one, you have been handed the invariant in the author's own words. Treat it as a requirement and check the sibling against it. If the sibling violates it, the author has already conceded the severity for you — quote the comment in your report.
+
+Two cautions on quoting. First, the comment usually scopes itself in its opening clause ("in the platform case…", "where the vendor package owns this…") while stating the general property later; read the whole block before claiming it governs the sibling, or a reviewer will correctly object that you quoted it out of context. Second, if you are writing this up anywhere public — a blog post, a skill like this one, a conference talk — do not reproduce the comment verbatim or near-verbatim while the defect is unpatched. A distinctive sentence is a search string, and publishing it points every reader at an unfixed bug. Paraphrase the shape, not the sentence.
 
 ### 2.4 Check the test suite for the tell
 

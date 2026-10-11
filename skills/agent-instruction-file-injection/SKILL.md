@@ -22,12 +22,12 @@ description: >-
 
 Products increasingly ship agent capability as **instruction files**: `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, hook scripts, MCP tool `description` fields, and "playbooks" the agent is told to follow. These files routinely contain lines like:
 
-> Run `coredumpctl info <exe>` for the crashed binary. Quote it.
+> Run `osquery --json "SELECT * FROM processes WHERE name = '<procname>'"` for the process the alert names. Quote the name.
 
 Three properties make that a vulnerability class rather than documentation:
 
 1. **The product's own code can be flawless.** Argv stays discrete, JSON is validated, positional parameters prevent re-tokenisation. Every hop a reviewer greps for is correct. The injection happens one hop further on, inside a step that exists only as English.
-2. **Escaping is delegated to a non-deterministic component.** "Quote it" is a request, not a guarantee. The model may single-quote, may not, may quote inconsistently across turns, and may be *argued out of quoting* by the data itself.
+2. **Escaping is delegated to a non-deterministic component.** "Quote the name" is a request, not a guarantee. The model may single-quote, may not, may quote inconsistently across turns, and may be *argued out of quoting* by the data itself.
 3. **The blast radius is whatever the agent is allowed to do.** If the harness launches with `--permission-mode auto`, `--yolo`, `bypassPermissions`, `--dangerously-skip-permissions`, `--approve-for-me` or equivalent, the assembled command runs with no prompt.
 
 ## 2. THE AUDIT
@@ -50,7 +50,7 @@ find . \( -name 'SKILL.md' -o -name 'AGENTS.md' -o -name 'CLAUDE.md' -o -name '*
        -o -path '*skills/*' -o -path '*hooks/*' -o -name 'mcp*.json' \) -type f | grep -v test
 ```
 
-For each file, extract every fenced block and every backticked command, then ask: **does any token in it come from runtime data?** Placeholders to hunt: `<exe>`, `$path`, `{{ filename }}`, "the crashed binary", "the process name", "the file the user selected", "the URL from the issue".
+For each file, extract every fenced block and every backticked command, then ask: **does any token in it come from runtime data?** Placeholders to hunt: `<procname>`, `$path`, `{{ filename }}`, "the process the alert names", "the file the user selected", "the URL from the issue", "the hostname from the ticket".
 
 ### 2.3 Classify each template
 
